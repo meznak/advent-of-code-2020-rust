@@ -1,17 +1,12 @@
 use crate::RunError;
 
-pub fn main(day: String, part: u8, data: String) -> Result<(), RunError> {
+pub fn main(part: u8, data: String) -> Result<i32, RunError> {
     let parsed_data = parse_data(data)?;
 
-    let result = match part {
+    match part {
         1 => part1(parsed_data),
         2 => part2(parsed_data),
         _ => Err(RunError::BadPartNum)
-    };
-
-    match result {
-        Ok(result) => Ok(println!("{day} part {part}:\n{result}")),
-        Err(_) => Err(RunError::PartFailed)
     }
 }
 
