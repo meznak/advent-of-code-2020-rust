@@ -1,0 +1,71 @@
+use crate::RunError;
+
+const DAY: &str = "XX";
+
+pub fn main(part: u8, data: String) -> Result<(), RunError> {
+    let parsed_data = parse_data(data)?;
+
+    let result = match part {
+        1 => part1(parsed_data),
+        2 => part2(parsed_data),
+        _ => Err(RunError::BadPartNum)
+    };
+
+    match result {
+        Ok(result) => Ok(println!("Day {DAY} Part {part}:\n{result}")),
+        Err(_) => Err(RunError::PartFailed)
+    }
+}
+
+fn parse_data(data: String) -> Result<Vec<i32>, RunError> {
+    let lines: Vec<&str> = data[..].split('\n').collect();
+
+    match lines.iter()
+        .map(|x| x.trim().parse::<i32>())
+        .collect() {
+            Ok(parsed_data) => Ok(parsed_data),
+            Err(_) => Err(RunError::Parse)
+        }
+}
+
+fn part1(values: Vec<i32>) -> Result<i32, RunError> {
+    // What's the goal?
+
+    todo!();
+
+    println!("The puzzle failed!");
+    Err(RunError::PartFailed)
+}
+
+fn part2(values: Vec<i32>) -> Result<i32, RunError> {
+    // What's the goal?
+
+    todo!();
+
+    println!("The puzzle failed!");
+    Err(RunError::PartFailed)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    static SAMPLE_INPUT: &str ="";
+    static SAMPLE_DATA: &'static [i32] = &[];
+    static SAMPLE_GOALS: [i32; 2] = (0, 0);
+
+    #[test]
+    fn test_parse() {
+        assert_eq!(parse_data(SAMPLE_INPUT.to_string()).unwrap(), SAMPLE_DATA);
+    }
+
+    #[test]
+    fn test_part1() {
+        assert_eq!(part1(SAMPLE_DATA.to_vec()).unwrap(), SAMPLE_GOALS.0);
+    }
+
+    #[test]
+    fn test_part2() {
+        assert_eq!(part2(SAMPLE_DATA.to_vec()).unwrap(), SAMPLE_GOALS.1);
+    }
+}
