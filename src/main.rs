@@ -1,7 +1,7 @@
 mod puzzles;
 mod runerror;
 
-use std::{fs, path,};
+use std::{fs, path};
 use clap::Parser;
 use runerror::RunError;
 
@@ -22,14 +22,21 @@ struct ParsedArgs {
 }
 
 fn main() -> Result<(), RunError> {
-    let parsed_args = parse_args().unwrap();
-    let data = get_data(&parsed_args.day).unwrap();
+    let parsed_args = parse_args()?;
+    let data = get_data(&parsed_args.day)?;
 
-    match &*parsed_args.day {
+    let result = match &*parsed_args.day {
         "day01" => {
-            puzzles::day01::main(parsed_args.day, parsed_args.part, data)
+            puzzles::day01::main(parsed_args.part, data)
         },
-        _ => {Err(RunError::NotImplemented)}
+        _ => Err(RunError::NotImplemented)
+    };
+
+    match result {
+        Ok(result) =>
+            Ok(println!("{} part {}:\n{}",
+            parsed_args.day, parsed_args.part, result)),
+        Err(_) => Err(RunError::PartFailed)
     }
 }
 
@@ -45,7 +52,10 @@ fn parse_args() -> Result<ParsedArgs, RunError> {
     Ok(ParsedArgs {day, part: args.part})
 }
 
-fn get_data(day: &str) -> Result<String, std::io::Error> {
+fn get_data(day: &str) -> Result<String, RunError> {
     let data_path = path::Path::new("data").join(day);
-    fs::read_to_string(data_path)
+    match fs::read_to_string(data_path) {
+        Ok(data) => Ok(data),
+        Err(e) => Err(RunError::IO(e))
+    }
 }
