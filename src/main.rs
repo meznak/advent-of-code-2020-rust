@@ -35,7 +35,7 @@ fn main() {
     let parsed_args = parse_args().unwrap();
     let data = get_data(&parsed_args.day).unwrap();
 
-    let result = match &*parsed_args.day.clone() {
+    let result = match &*parsed_args.day {
         "day01" => {
             puzzles::day01::main(parsed_args.part, data)
         },
@@ -62,7 +62,7 @@ fn main() {
     }
 }
 
-fn parse_args<'a>() -> Result<ParsedArgs, ()> {
+fn parse_args() -> Result<ParsedArgs, ()> {
     let args = Args::parse();
 
     if args.part < 1 || args.part > 2 {
@@ -72,7 +72,7 @@ fn parse_args<'a>() -> Result<ParsedArgs, ()> {
 
     let day = format!("day{:02}", args.day);
 
-    Ok(ParsedArgs {day: day, part: args.part})
+    Ok(ParsedArgs {day, part: args.part})
 }
 
 fn get_data(day: &str) -> Result<String, std::io::Error> {

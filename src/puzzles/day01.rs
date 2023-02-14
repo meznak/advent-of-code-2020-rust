@@ -3,7 +3,6 @@ use crate::RunError;
 pub fn main(part: u8, data: String) -> Result<(), RunError> {
     let parsed_data = parse_data(data)?;
 
-
     let result = match part {
         1 => part1(parsed_data),
         2 => part2(parsed_data),
@@ -31,10 +30,8 @@ fn part1(values: Vec<i32>) -> Result<i32, RunError> {
     // Find two entries that sum to 2020 and return their product.
     for i in values.iter() {
         for j in values.iter() {
-            if i != j {
-                if *i + *j == 2020 {
-                    return Ok(i * j);
-                }
+            if i != j && *i + *j == 2020 {
+                return Ok(i * j);
             }
         }
     }
@@ -49,10 +46,8 @@ fn part2(values: Vec<i32>) -> Result<i32, RunError> {
         for j in values.iter() {
             if i != j {
                 for k in values.iter() {
-                    if k != j {
-                        if *i + *j + *k == 2020 {
-                            return Ok(i * j * k);
-                        }
+                    if k != j && *i + *j + *k == 2020 {
+                        return Ok(i * j * k);
                     }
                 }
             }
