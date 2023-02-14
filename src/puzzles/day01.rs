@@ -1,6 +1,6 @@
 use crate::RunError;
 
-pub fn main(part: u8, data: String) -> Result<(), RunError> {
+pub fn main(day: String, part: u8, data: String) -> Result<(), RunError> {
     let parsed_data = parse_data(data)?;
 
     let result = match part {
@@ -10,7 +10,7 @@ pub fn main(part: u8, data: String) -> Result<(), RunError> {
     };
 
     match result {
-        Ok(result) => Ok(println!("Day 01 Part {part}:\n{result}")),
+        Ok(result) => Ok(println!("{day} part {part}:\n{result}")),
         Err(_) => Err(RunError::PartFailed)
     }
 }
@@ -22,7 +22,7 @@ fn parse_data(data: String) -> Result<Vec<i32>, RunError> {
         .map(|x| x.trim().parse::<i32>())
         .collect() {
             Ok(parsed_data) => Ok(parsed_data),
-            Err(_) => Err(RunError::Parse)
+            Err(e) => Err(RunError::Parse(e))
         }
 }
 
