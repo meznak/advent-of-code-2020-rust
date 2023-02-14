@@ -1,7 +1,5 @@
 use crate::RunError;
 
-const DAY: &str = "XX";
-
 pub fn main(part: u8, data: String) -> Result<(), RunError> {
     let parsed_data = parse_data(data)?;
 
@@ -12,7 +10,7 @@ pub fn main(part: u8, data: String) -> Result<(), RunError> {
     };
 
     match result {
-        Ok(result) => Ok(println!("Day {DAY} Part {part}:\n{result}")),
+        Ok(result) => Ok(println!("{day} part {part}:\n{result}")),
         Err(_) => Err(RunError::PartFailed)
     }
 }
