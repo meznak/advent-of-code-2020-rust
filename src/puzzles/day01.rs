@@ -31,12 +31,10 @@ fn part1(values: Vec<i32>) -> Result<i32, RunError> {
     // Find two entries that sum to 2020 and return their product.
     for i in values.iter() {
         for j in values.iter() {
-            if i == j {
-                continue;
-            }
-
-            if *i + *j == 2020 {
-                return Ok(i * j);
+            if i != j {
+                if *i + *j == 2020 {
+                    return Ok(i * j);
+                }
             }
         }
     }
@@ -46,7 +44,23 @@ fn part1(values: Vec<i32>) -> Result<i32, RunError> {
 }
 
 fn part2(values: Vec<i32>) -> Result<i32, RunError> {
-    todo!();
+    // Find three entries that sum to 2020 and return their product.
+    for i in values.iter() {
+        for j in values.iter() {
+            if i != j {
+                for k in values.iter() {
+                    if k != j {
+                        if *i + *j + *k == 2020 {
+                            return Ok(i * j * k);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    println!("No triples found!");
+    Err(RunError::PartFailed)
 }
 
 #[cfg(test)]
@@ -76,5 +90,10 @@ mod tests {
     #[test]
     fn test_part1() {
         assert_eq!(part1(SAMPLE_DATA.to_vec()).unwrap(), 514579);
+    }
+
+    #[test]
+    fn test_part2() {
+        assert_eq!(part2(SAMPLE_DATA.to_vec()).unwrap(), 241861950);
     }
 }
