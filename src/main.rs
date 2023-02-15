@@ -3,6 +3,7 @@ mod runerror;
 
 use std::{fs, path};
 use clap::Parser;
+// use crate::puzzles;
 use runerror::RunError;
 
 #[derive(Parser, Debug)]
@@ -26,9 +27,8 @@ fn main() -> Result<(), RunError> {
     let data = get_data(&parsed_args.day)?;
 
     let result = match &*parsed_args.day {
-        "day01" => {
-            puzzles::day01::main(parsed_args.part, data)
-        },
+        "day01" => {puzzles::day01::main(parsed_args.part, data)},
+        "day02" => {puzzles::day02::main(parsed_args.part, data)},
         _ => Err(RunError::NotImplemented)
     };
 
