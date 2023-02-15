@@ -21,6 +21,9 @@ pub enum RunError {
     #[error("Puzzle solver failed to run")]
     PartFailed,
 
+    #[error("Input value out of bounds")]
+    InputBounds,
+
     #[error("Unable to read file: {0}")]
     IO(#[from] io::Error)
 }

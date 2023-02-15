@@ -59,16 +59,30 @@ fn part1(values: &[Password]) -> Result<usize, RunError> {
         }
     }
 
-    return Ok(valid_count);
+    Ok(valid_count)
 }
 
 fn part2(values: &[Password]) -> Result<usize, RunError> {
-    // What's the goal?
+    // Check given positions for a given character
 
-    todo!();
+    let mut valid_count: usize = 0;
 
-    println!("The puzzle failed!");
-    Err(RunError::PartFailed)
+    for value in values {
+        if value.password.len() < value.max {
+            return Err(RunError::InputBounds);
+        }
+
+        let first = value.password.get(value.min - 1..value.min)
+            .ok_or(RunError::PartFailed)?.chars().next().ok_or(RunError::PartFailed)?;
+        let last = value.password.get(value.max - 1..value.max)
+            .ok_or(RunError::PartFailed)?.chars().next().ok_or(RunError::PartFailed)?;
+        if  first != last && (first == value.character || last == value.character ) {
+            valid_count += 1;
+        }
+    }
+
+    Ok(valid_count)
+
 }
 
 #[cfg(test)]
@@ -85,7 +99,7 @@ mod tests {
         Password {min: 2, max: 9, character: 'c', password: "ccccccccc"},
         ];
 
-    const SAMPLE_GOALS: [usize; 2] = [2, 0];
+    const SAMPLE_GOALS: [usize; 2] = [2, 1];
 
     #[test]
     fn test_parse() {
