@@ -1,7 +1,6 @@
 use std::{
     io,
     num::ParseIntError,
-    string::ParseError,
 };
 use thiserror::Error;
 
@@ -11,7 +10,7 @@ pub enum RunError {
     ParseInt(#[from] ParseIntError),
 
     #[error("Unable to parse {0}")]
-    ParseString(#[from] ParseError),
+    ParseString(String),
 
     #[error("That day is not yet implemented")]
     NotImplemented,
