@@ -2,13 +2,13 @@ use crate::RunError;
 
 #[derive(Debug, Clone, PartialEq)]
 struct Password <'a> {
-    min: i32,
-    max: i32,
+    min: usize,
+    max: usize,
     character: char,
     password: &'a str
 }
 
-pub fn main(part: u8, data: String) -> Result<i32, RunError> {
+pub fn main(part: u8, data: String) -> Result<usize, RunError> {
     let parsed_data = parse_data(&data)?;
 
     match part {
@@ -28,17 +28,14 @@ fn parse_data<'a>(data: &'a str) -> Result<Vec<Password <'a>>, RunError> {
     for line in lines {
         let parts: Vec<&str> = line.split(' ').collect();
         let min_max: Vec<&str> = parts[0].split('-').collect();
-        // How do I safely extract a character?
-        //let character: char = parts[1].chars().next().ok_or(RunError::ParseString)?;
         let character: char = match parts[1].chars().next() {
             Some(c) => c,
             None => {return Err(RunError::ParseString(parts[1].to_string()));}
         };
-        //let character: char = parts[1].split(':').collect();
 
         passwords.push(Password {
-            min: min_max[0].parse::<i32>()?,
-            max: min_max[1].parse::<i32>()?,
+            min: min_max[0].parse::<usize>()?,
+            max: min_max[1].parse::<usize>()?,
             character,
             password: parts[2]
         });
@@ -48,16 +45,24 @@ fn parse_data<'a>(data: &'a str) -> Result<Vec<Password <'a>>, RunError> {
 
 }
 
-fn part1(values: &[Password]) -> Result<i32, RunError> {
-    // What's the goal?
+fn part1(values: &[Password]) -> Result<usize, RunError> {
+    // Count valid passwords, given allowed counts of a specified character
 
-    todo!();
+    let mut valid_count: usize = 0;
 
-    println!("The puzzle failed!");
-    Err(RunError::PartFailed)
+    for value in values {
+        let character_count = value.password.chars()
+            .filter(|character| *character == value.character)
+            .count();
+        if character_count >= value.min && character_count <= value.max {
+            valid_count += 1;
+        }
+    }
+
+    return Ok(valid_count);
 }
 
-fn part2(values: &[Password]) -> Result<i32, RunError> {
+fn part2(values: &[Password]) -> Result<usize, RunError> {
     // What's the goal?
 
     todo!();
@@ -80,7 +85,7 @@ mod tests {
         Password {min: 2, max: 9, character: 'c', password: "ccccccccc"},
         ];
 
-    const SAMPLE_GOALS: [i32; 2] = [542, 0];
+    const SAMPLE_GOALS: [usize; 2] = [2, 0];
 
     #[test]
     fn test_parse() {
