@@ -17,7 +17,7 @@ fn parse_data(data: String) -> Result<Vec<i32>, RunError> {
         .map(|x| x.trim().parse::<i32>())
         .collect() {
             Ok(parsed_data) => Ok(parsed_data),
-            Err(e) => Err(RunError::Parse(e))
+            Err(e) => Err(RunError::ParseInt(e))
         }
 }
 
