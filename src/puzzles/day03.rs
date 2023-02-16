@@ -43,9 +43,30 @@ fn part1(values: Vec<Vec<char>>) -> Result<usize, RunError> {
 }
 
 fn part2(values: Vec<Vec<char>>) -> Result<usize, RunError> {
-    // What's the goal?
+    // Count trees along various slopes, return product
 
-    todo!();
+    let height = values.len();
+    let width = values[0].len();
+    let mut trees_hit_product = 1;
+
+    let slopes = [(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)];
+
+    for (dx, dy) in slopes {
+        let (mut x, mut y) = (0, 0);
+        let mut trees_hit = 0;
+
+        while y < height {
+            if values[y][x] == '#' {
+                trees_hit += 1
+            }
+
+            x = (x + dx) % width;
+            y += dy;
+        }
+        trees_hit_product *= trees_hit;
+    }
+
+    Ok(trees_hit_product)
 }
 
 #[cfg(test)]
@@ -75,7 +96,8 @@ mod tests {
         ['#','.','#','#','.','.','.','#','.','.','.'],
         ['#','.','.','.','#','#','.','.','.','.','#'],
         ['.','#','.','.','#','.','.','.','#','.','#'],];
-    static SAMPLE_GOALS: [usize; 2] = [7, 0];
+
+    static SAMPLE_GOALS: [usize; 2] = [7, 336];
 
     #[test]
     fn test_parse() {
