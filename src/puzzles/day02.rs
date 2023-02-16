@@ -8,8 +8,8 @@ struct Password <'a> {
     password: &'a str
 }
 
-pub fn main(part: u8, data: String) -> Result<usize, RunError> {
-    let parsed_data = parse_data(&data)?;
+pub fn main(part: u8, data: &str) -> Result<usize, RunError> {
+    let parsed_data = parse_data(data)?;
 
     match part {
         1 => part1(&parsed_data),

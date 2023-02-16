@@ -3,7 +3,6 @@ mod runerror;
 
 use std::{fs, path};
 use clap::Parser;
-// use crate::puzzles;
 use runerror::RunError;
 
 #[derive(Parser, Debug)]
@@ -13,7 +12,7 @@ struct Args {
     day: u8,
 
     // Puzzle part
-    #[arg(short, long, default_value_t = 1)]
+    #[arg(short, long, default_value_t = 0)]
     part: u8,
 }
 
@@ -25,22 +24,31 @@ struct ParsedArgs {
 fn main() -> Result<(), RunError> {
     let parsed_args = parse_args()?;
     let data = get_data(&parsed_args.day)?;
-
-    let result = match &*parsed_args.day {
-        "day01" => {puzzles::day01::main(parsed_args.part, data)?},
-        "day02" => {puzzles::day02::main(parsed_args.part, data)?},
-        "day03" => {puzzles::day03::main(parsed_args.part, data)?},
-        _ => {return Err(RunError::NotImplemented(parsed_args.day));}
+    let parts: Vec<u8> = match parsed_args.part {
+        0 => [1, 2].to_vec(),
+        p => [p].to_vec()
     };
 
-    Ok(println!("{} part {}:\n{}",
-    parsed_args.day, parsed_args.part, result))
+    for part in parts {
+
+        let result = match &*parsed_args.day {
+            "day01" => {puzzles::day01::main(part, &data)?},
+            "day02" => {puzzles::day02::main(part, &data)?},
+            "day03" => {puzzles::day03::main(part, &data)?},
+            _ => {return Err(RunError::NotImplemented(parsed_args.day));}
+        };
+
+        println!("{} part {}:\n{}",
+        parsed_args.day, part, result)
+    }
+
+    Ok(())
 }
 
 fn parse_args() -> Result<ParsedArgs, RunError> {
     let args = Args::parse();
 
-    if args.part < 1 || args.part > 2 {
+    if args.part > 2 {
         return Err(RunError::BadPartNum);
     }
 
