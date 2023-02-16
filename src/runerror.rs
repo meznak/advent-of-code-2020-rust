@@ -12,8 +12,8 @@ pub enum RunError {
     #[error("Unable to parse {0}")]
     ParseString(String),
 
-    #[error("That day is not yet implemented")]
-    NotImplemented,
+    #[error("{0} is not yet implemented")]
+    NotImplemented(String),
 
     #[error("Invalid part number specified")]
     BadPartNum,
