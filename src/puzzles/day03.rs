@@ -1,4 +1,5 @@
 use crate::RunError;
+use std::{thread, sync::{Arc, Mutex}};
 
 pub fn main(part: u8, data: &str) -> Result<usize, RunError> {
     let parsed_data = parse_data(data)?;
@@ -47,26 +48,35 @@ fn part2(values: Vec<Vec<char>>) -> Result<usize, RunError> {
 
     let height = values.len();
     let width = values[0].len();
-    let mut trees_hit_product = 1;
 
+    let grid = Arc::new(values);
+    let trees_hit_product = Arc::new(Mutex::new(1));
     let slopes = [(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)];
 
+    let mut handles: Vec<thread::JoinHandle<_>> = vec![];
     for (dx, dy) in slopes {
-        let (mut x, mut y) = (0, 0);
-        let mut trees_hit = 0;
+        let trees_hit_product_shared = Arc::clone(&trees_hit_product);
+        let grid_shared = Arc::clone(&grid);
 
-        while y < height {
-            if values[y][x] == '#' {
-                trees_hit += 1
+        handles.push(thread::spawn(move || {
+            let (mut x, mut y) = (0, 0);
+            let mut trees_hit = 0;
+
+            while y < height {
+                if grid_shared[y][x] == '#' {
+                    trees_hit += 1
+                }
+
+                x = (x + dx) % width;
+                y += dy;
             }
 
-            x = (x + dx) % width;
-            y += dy;
-        }
-        trees_hit_product *= trees_hit;
+            *trees_hit_product_shared.lock().unwrap() *= trees_hit;
+        }));
     }
 
-    Ok(trees_hit_product)
+    let ret_val = Ok(*trees_hit_product.lock().unwrap());
+    ret_val
 }
 
 #[cfg(test)]
