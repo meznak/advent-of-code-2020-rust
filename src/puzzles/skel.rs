@@ -13,30 +13,19 @@ pub fn main(part: u8, data: String) -> Result<i32, RunError> {
 fn parse_data(data: String) -> Result<Vec<i32>, RunError> {
     let lines: Vec<&str> = data[..].split('\n').collect();
 
-    match lines.iter()
-        .map(|x| x.trim().parse::<i32>())
-        .collect() {
-            Ok(parsed_data) => Ok(parsed_data),
-            Err(e) => Err(RunError::Parse(e))
-        }
+    todo!();
 }
 
 fn part1(values: Vec<i32>) -> Result<i32, RunError> {
     // What's the goal?
 
     todo!();
-
-    println!("The puzzle failed!");
-    Err(RunError::PartFailed)
 }
 
 fn part2(values: Vec<i32>) -> Result<i32, RunError> {
     // What's the goal?
 
     todo!();
-
-    println!("The puzzle failed!");
-    Err(RunError::PartFailed)
 }
 
 #[cfg(test)]
@@ -45,7 +34,7 @@ mod tests {
 
     static SAMPLE_INPUT: &str ="";
     static SAMPLE_DATA: &'static [i32] = &[];
-    static SAMPLE_GOALS: [i32; 2] = (0, 0);
+    static SAMPLE_GOALS: [usize; 2] = [0, 0];
 
     #[test]
     fn test_parse() {
