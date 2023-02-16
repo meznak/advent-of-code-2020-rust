@@ -1,6 +1,6 @@
 use crate::RunError;
 
-pub fn main(part: u8, data: String) -> Result<i32, RunError> {
+pub fn main(part: u8, data: String) -> Result<usize, RunError> {
     let parsed_data = parse_data(data)?;
 
     match part {
@@ -10,19 +10,19 @@ pub fn main(part: u8, data: String) -> Result<i32, RunError> {
     }
 }
 
-fn parse_data(data: String) -> Result<Vec<i32>, RunError> {
+fn parse_data(data: String) -> Result<Vec<usize>, RunError> {
     let lines: Vec<&str> = data[..].split('\n').collect();
 
     todo!();
 }
 
-fn part1(values: Vec<i32>) -> Result<i32, RunError> {
+fn part1(values: Vec<usize>) -> Result<usize, RunError> {
     // What's the goal?
 
     todo!();
 }
 
-fn part2(values: Vec<i32>) -> Result<i32, RunError> {
+fn part2(values: Vec<usize>) -> Result<usize, RunError> {
     // What's the goal?
 
     todo!();
@@ -38,16 +38,22 @@ mod tests {
 
     #[test]
     fn test_parse() {
-        assert_eq!(parse_data(SAMPLE_INPUT.to_string()).unwrap(), SAMPLE_DATA);
+        assert_eq!(
+            parse_data(SAMPLE_INPUT.to_string()).unwrap(),
+            SAMPLE_DATA);
     }
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(SAMPLE_DATA.to_vec()).unwrap(), SAMPLE_GOALS.0);
+        assert_eq!(
+            part1(SAMPLE_DATA.to_vec()).unwrap(),
+            SAMPLE_GOALS[0]);
     }
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(SAMPLE_DATA.to_vec()).unwrap(), SAMPLE_GOALS.1);
+        assert_eq!(
+            part2(SAMPLE_DATA.to_vec()).unwrap(),
+            SAMPLE_GOALS[1]);
     }
 }
