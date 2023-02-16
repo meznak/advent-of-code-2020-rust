@@ -25,7 +25,21 @@ fn parse_data(data: String) -> Result<Vec<Vec<char>>, RunError> {
 fn part1(values: Vec<Vec<char>>) -> Result<usize, RunError> {
     // Count trees along slope -1/3
 
-    todo!();
+    let (mut x, mut y) = (0, 0);
+    let height = values.len();
+    let width = values[0].len();
+    let mut trees_hit = 0;
+
+    while y < height {
+        if values[y][x] == '#' {
+            trees_hit += 1
+        }
+
+        x = (x + 3) % width;
+        y += 1;
+    }
+
+    Ok(trees_hit)
 }
 
 fn part2(values: Vec<Vec<char>>) -> Result<usize, RunError> {
