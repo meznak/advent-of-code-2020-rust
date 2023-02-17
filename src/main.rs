@@ -35,6 +35,7 @@ fn main() -> Result<(), RunError> {
             "day01" => {puzzles::day01::main(part, &data)?},
             "day02" => {puzzles::day02::main(part, &data)?},
             "day03" => {puzzles::day03::main(part, &data)?},
+            "day04" => {puzzles::day04::main(part, &data)?},
             _ => {return Err(RunError::NotImplemented(parsed_args.day));}
         };
 
