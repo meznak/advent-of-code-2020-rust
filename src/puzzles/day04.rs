@@ -8,7 +8,7 @@ struct Passport <'a> {
     hgt: Option<&'a str>, // Height
     hcl: Option<&'a str>, // Hair Color
     ecl: Option<&'a str>, // Eye Color
-    pid: Option<usize>, // Passport ID
+    pid: Option<&'a str>, // Passport ID
     cid: Option<u16>, // Country ID
 }
 
@@ -60,7 +60,7 @@ fn parse_data<'a>(data: &str) -> Result<Vec<Passport>, RunError> {
                 "hgt" => passport.hgt = Some(kv[1]),
                 "hcl" => passport.hcl = Some(kv[1]),
                 "ecl" => passport.ecl = Some(kv[1]),
-                "pid" => passport.pid = Some(kv[1].parse::<usize>()?),
+                "pid" => passport.pid = Some(kv[1]),
                 "cid" => passport.cid = Some(kv[1].parse::<u16>()?),
                 "" => {},
                 _ => {return Err(RunError::ParseString(pair.to_string()))}
@@ -75,9 +75,16 @@ fn parse_data<'a>(data: &str) -> Result<Vec<Passport>, RunError> {
 }
 
 fn part1(values: &[Passport]) -> Result<usize, RunError> {
-    // What's the goal?
+    // Count valid passports: has all fields, ignoring cid
 
-    todo!();
+    Ok(values.iter().filter(|passport|
+        passport.byr != None &&
+        passport.iyr != None &&
+        passport.eyr != None &&
+        passport.hgt != None &&
+        passport.hcl != None &&
+        passport.ecl != None &&
+        passport.pid != None).count())
 }
 
 fn part2(values: &[Passport]) -> Result<usize, RunError> {
