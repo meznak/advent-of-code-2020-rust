@@ -1,6 +1,6 @@
 use crate::RunError;
 
-pub fn main(part: u8, data: String) -> Result<usize, RunError> {
+pub fn main(part: u8, data: &str) -> Result<usize, RunError> {
     let parsed_data = parse_data(data)?;
 
     match part {
@@ -10,7 +10,7 @@ pub fn main(part: u8, data: String) -> Result<usize, RunError> {
     }
 }
 
-fn parse_data(data: String) -> Result<Vec<usize>, RunError> {
+fn parse_data(data: &str) -> Result<Vec<usize>, RunError> {
     let lines: Vec<&str> = data[..].split('\n').collect();
 
     todo!();
