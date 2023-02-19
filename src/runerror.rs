@@ -2,6 +2,7 @@ use std::{
     io,
     num::ParseIntError,
 };
+use regex;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -25,5 +26,8 @@ pub enum RunError {
     InputBounds,
 
     #[error("Unable to read file: {0}")]
-    IO(#[from] io::Error)
+    IO(#[from] io::Error),
+
+    #[error("Bad regex pattern: {0}")]
+    Regex(String)
 }
