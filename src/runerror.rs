@@ -2,7 +2,6 @@ use std::{
     io,
     num::ParseIntError,
 };
-use regex;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
