@@ -21,10 +21,10 @@ fn parse_data(data: &str) -> Result<Vec<Ticket>, RunError> {
 
     data.split('\n')
         .map(|line: &str|
-            line.replace("F", "0")
-                .replace("B", "1")
-                .replace("L", "0")
-                .replace("R", "1")
+            line.replace('F', "0")
+                .replace('B', "1")
+                .replace('L', "0")
+                .replace('R', "1")
         )
         .for_each(|line: String| {
             tickets.push(Ticket {
