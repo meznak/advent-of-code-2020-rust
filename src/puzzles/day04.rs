@@ -28,7 +28,7 @@ struct Height {
     unit: Unit,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Default, PartialEq)]
 struct Passport <'a> {
     byr: Option<u16>, // Birth Year
     iyr: Option<u16>, // Issue Year
@@ -40,23 +40,8 @@ struct Passport <'a> {
     cid: Option<u16>, // Country ID
 }
 
-impl <'a> Default for Passport <'a> {
-    fn default() -> Passport <'a> {
-        Passport {
-            byr: None,
-            iyr: None,
-            eyr: None,
-            hgt: None,
-            hcl: None,
-            ecl: None,
-            pid: None,
-            cid: None,
-        }
-    }
-}
-
 pub fn main(part: u8, data: &str) -> Result<usize, RunError> {
-    let parsed_data = parse_data(&data)?;
+    let parsed_data = parse_data(data)?;
 
     match part {
         1 => part1(&parsed_data),
@@ -65,7 +50,7 @@ pub fn main(part: u8, data: &str) -> Result<usize, RunError> {
     }
 }
 
-fn parse_data<'a>(data: &str) -> Result<Vec<Passport>, RunError> {
+fn parse_data(data: &str) -> Result<Vec<Passport>, RunError> {
     let mut passports: Vec<Passport> = vec![];
     let mut passport: Passport;
 
@@ -118,13 +103,13 @@ fn part1(values: &[Passport]) -> Result<usize, RunError> {
     // Count valid passports: has all fields, ignoring cid
 
     Ok(values.iter().filter(|passport|
-        passport.byr != None &&
-        passport.iyr != None &&
-        passport.eyr != None &&
-        passport.hgt != None &&
-        passport.hcl != None &&
-        passport.ecl != None &&
-        passport.pid != None)
+        passport.byr.is_some() &&
+        passport.iyr.is_some() &&
+        passport.eyr.is_some() &&
+        passport.hgt.is_some() &&
+        passport.hcl.is_some() &&
+        passport.ecl.is_some() &&
+        passport.pid.is_some())
         .count())
 }
 
@@ -136,13 +121,14 @@ fn part2(values: &[Passport]) -> Result<usize, RunError> {
     let re_pid = Regex::new(r"^[0-9]{9}$").unwrap();
 
     Ok(values.iter().filter(|passport|
-        passport.byr.map_or(false, |x| x >= 1920 && x <= 2002) &&
-        passport.iyr.map_or(false, |x| x >= 2010 && x <= 2020) &&
-        passport.eyr.map_or(false, |x| x >= 2020 && x <= 2030) &&
+        passport.byr.map_or(false, |x| (1920..2002).contains(&x)) &&
+        passport.iyr.map_or(false, |x| (2010..2020).contains(&x)) &&
+        passport.eyr.map_or(false, |x| (2020..2030).contains(&x)) &&
         passport.hgt.as_ref().map_or(false, |x|
             match x.unit {
-                Unit::Cm => x.value >= 150 && x.value <= 193,
-                Unit::Inch => x.value >= 59 && x.value <= 76,
+                Unit::Cm => (150..193).contains(&x.value),
+                Unit::Inch => (59..76).contains(&x.value
+                ),
                 Unit::None => false,
         }) &&
         passport.hcl.map_or(false, |x| re_hcl.is_match(x)) &&
