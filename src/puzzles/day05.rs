@@ -40,18 +40,35 @@ fn part1(values: &[Ticket]) -> Result<usize, RunError> {
     // Seat ID: row * 8 + seat
     // Return highest seat ID seen
 
-    values.iter().map(|ticket|
-        ticket.row * 8 + ticket.col
-    )
+    calculate_seats(values)?
+    .into_iter()
     .max()
     .ok_or(RunError::PartFailed)
 
 }
 
 fn part2(values: &[Ticket]) -> Result<usize, RunError> {
-    // What's the goal?
+    // Find the seat not on the list
 
-    todo!();
+    let mut seats = calculate_seats(values)?;
+    seats.sort();
+
+    for position in 0..seats.len() {
+        if seats[position + 1] != seats[position] + 1 {
+            return Ok(seats[position] + 1);
+        }
+    }
+
+    Err(RunError::PartFailed)
+}
+
+fn calculate_seats(values: &[Ticket]) -> Result<Vec<usize>, RunError> {
+    // Calculate all seat numbers
+
+    Ok(values.iter().map(|ticket|
+        ticket.row * 8 + ticket.col
+    )
+    .collect::<Vec<usize>>())
 }
 
 #[cfg(test)]
