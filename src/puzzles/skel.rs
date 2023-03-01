@@ -16,13 +16,13 @@ fn parse_data(data: &str) -> Result<Vec<usize>, RunError> {
     todo!();
 }
 
-fn part1(values: Vec<usize>) -> Result<usize, RunError> {
+fn part1(values: &[usize]) -> Result<usize, RunError> {
     // What's the goal?
 
     todo!();
 }
 
-fn part2(values: Vec<usize>) -> Result<usize, RunError> {
+fn part2(values: &[usize]) -> Result<usize, RunError> {
     // What's the goal?
 
     todo!();
@@ -39,21 +39,21 @@ mod tests {
     #[test]
     fn test_parse() {
         assert_eq!(
-            parse_data(SAMPLE_INPUT.to_string()).unwrap(),
+            parse_data(SAMPLE_INPUT).unwrap(),
             SAMPLE_DATA);
     }
 
     #[test]
     fn test_part1() {
         assert_eq!(
-            part1(SAMPLE_DATA.to_vec()).unwrap(),
+            part1(&SAMPLE_DATA).unwrap(),
             SAMPLE_GOALS[0]);
     }
 
     #[test]
     fn test_part2() {
         assert_eq!(
-            part2(SAMPLE_DATA.to_vec()).unwrap(),
+            part2(&SAMPLE_DATA).unwrap(),
             SAMPLE_GOALS[1]);
     }
 }
