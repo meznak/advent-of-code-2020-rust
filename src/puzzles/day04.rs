@@ -6,6 +6,26 @@ use regex::Regex;
 enum Unit {
     Cm,
     Inch,
+    None,
+}
+
+impl TryFrom<&str> for Unit {
+    type Error = RunError;
+
+    fn try_from(input: &str) -> Result<Unit, RunError> {
+        match input {
+        "cm" => Ok(Unit::Cm),
+        "in" => Ok(Unit::Inch),
+        "" => Ok(Unit::None),
+        _ => Err(RunError::Regex(input.to_string()))
+        }
+    }
+}
+
+#[derive(Debug, PartialEq)]
+struct Height {
+    value: u16,
+    unit: Unit,
 }
 
 #[derive(Debug, PartialEq)]
@@ -13,8 +33,7 @@ struct Passport <'a> {
     byr: Option<u16>, // Birth Year
     iyr: Option<u16>, // Issue Year
     eyr: Option<u16>, // Expiration Year
-    hgt: Option<u16>, // Height
-    unit: Option<Unit>, // Height unit
+    hgt: Option<Height>, // Height
     hcl: Option<&'a str>, // Hair Color
     ecl: Option<&'a str>, // Eye Color
     pid: Option<&'a str>, // Passport ID
@@ -28,7 +47,6 @@ impl <'a> Default for Passport <'a> {
             iyr: None,
             eyr: None,
             hgt: None,
-            unit: None,
             hcl: None,
             ecl: None,
             pid: None,
@@ -48,19 +66,13 @@ pub fn main(part: u8, data: &str) -> Result<usize, RunError> {
 }
 
 fn parse_data<'a>(data: &str) -> Result<Vec<Passport>, RunError> {
-    let re_height = Regex::new(r"(?P<height>\d+)(<?Punit>\w{2})").unwrap();
-
-    let lines: Vec<&str> = data[..].split('\n').collect();
-
     let mut passports: Vec<Passport> = vec![];
-    let mut passport = Passport::default();
+    let mut passport: Passport;
 
-    for line in lines {
-        if line == "" {
-            passports.push(passport);
-            passport = Passport::default();
-        }
-        let kv_pairs: Vec<&str> = line.split(' ').collect();
+    for line in data.split("\n\n").collect::<Vec<&str>>() {
+        passport = Passport::default();
+
+        let kv_pairs: Vec<&str> = line.split(&['\n', ' ']).collect();
 
         for pair in kv_pairs {
             let kv: Vec<&str> = pair.split(':').collect();
@@ -68,25 +80,7 @@ fn parse_data<'a>(data: &str) -> Result<Vec<Passport>, RunError> {
                 "byr" => passport.byr = Some(kv[1].parse::<u16>()?),
                 "iyr" => passport.iyr = Some(kv[1].parse::<u16>()?),
                 "eyr" => passport.eyr = Some(kv[1].parse::<u16>()?),
-                "hgt" => {
-                    let cap = re_height.captures(kv[1]).ok_or_else(|| {Err(RunError::Regex(pair.to_string()))})?;
-                    match cap.len() {
-                        2 => {
-                            passport.hgt = cap.name("height")
-                                .map_or(None,
-                                    |x| Some(x.as_str().parse::<u16>().ok()?));
-                            passport.unit = cap.name("unit")
-                                .map_or(None,
-                                    |x| match x.as_str() {
-                                        "cm" => Some(Unit::Cm),
-                                        "in" => Some(Unit::Inch),
-                                        _ => None
-                                    }
-                                )
-                        },
-                        _ => return Err(RunError::ParseString(pair.to_string()))
-                    }
-                },
+                "hgt" => passport.hgt = parse_height(kv[1]).unwrap_or(None),
                 "hcl" => passport.hcl = Some(kv[1]),
                 "ecl" => passport.ecl = Some(kv[1]),
                 "pid" => passport.pid = Some(kv[1]),
@@ -95,13 +89,29 @@ fn parse_data<'a>(data: &str) -> Result<Vec<Passport>, RunError> {
                 _ => {return Err(RunError::ParseString(pair.to_string()))}
             }
         }
+
+       passports.push(passport);
     }
 
-    // last line of file isn't empty so the
-    // last record doesn't get pushed in the loop
-    passports.push(passport);
-
     Ok(passports)
+}
+
+fn parse_height(text: &str) -> Result<Option<Height>, RunError> {
+    let re_height = Regex::new(r"(?P<value>\d+)(?P<unit>\w{0,2})").unwrap();
+
+    let cap = re_height.captures(text)
+        .ok_or_else(|| RunError::Regex(text.to_string()))?;
+
+    let value = cap.name("value")
+        .ok_or(RunError::Regex(text.to_string()))?
+        .as_str()
+        .parse()?;
+    let unit = cap.name("unit")
+        .ok_or(RunError::Regex(text.to_string()))?
+        .as_str()
+        .try_into()?;
+
+    Ok(Some(Height { value, unit }))
 }
 
 fn part1(values: &[Passport]) -> Result<usize, RunError> {
@@ -114,28 +124,31 @@ fn part1(values: &[Passport]) -> Result<usize, RunError> {
         passport.hgt != None &&
         passport.hcl != None &&
         passport.ecl != None &&
-        passport.pid != None).count())
+        passport.pid != None)
+        .count())
 }
 
 fn part2(values: &[Passport]) -> Result<usize, RunError> {
     // Count valid passports: has all fields with valid values, ignoring cid
 
-    let re_color = Regex::new(r"#[[:alpha:]0-9]{6}").unwrap();
+    let re_hcl = Regex::new(r"#[[:alpha:]0-9]{6}").unwrap();
+    let re_ecl = Regex::new(r"amb|blu|brn|gry|grn|hzl|oth").unwrap();
     let re_pid = Regex::new(r"[0-9]{9}").unwrap();
 
     Ok(values.iter().filter(|passport|
         passport.byr.map_or(false, |x| x >= 1920 && x <= 2002) &&
         passport.iyr.map_or(false, |x| x >= 2010 && x <= 2020) &&
         passport.eyr.map_or(false, |x| x >= 2020 && x <= 2030) &&
-        passport.hgt.map_or(false, |x|
-            match passport.unit {
-                Some(Unit::Cm) => x >= 150 && x <= 193,
-                Some(Unit::Inch) => x >= 59 && x <= 76,
-                _ => false
+        passport.hgt.as_ref().map_or(false, |x|
+            match x.unit {
+                Unit::Cm => x.value >= 150 && x.value <= 193,
+                Unit::Inch => x.value >= 59 && x.value <= 76,
+                Unit::None => false,
         }) &&
-        passport.hcl.map_or(false, |x| re_color.is_match(x)) &&
-        passport.ecl.map_or(false, |x| re_color.is_match(x)) &&
-        passport.pid.map_or(false, |x| re_pid.is_match(x))).count())
+        passport.hcl.map_or(false, |x| re_hcl.is_match(x)) &&
+        passport.ecl.map_or(false, |x| re_ecl.is_match(x)) &&
+        passport.pid.map_or(false, |x| re_pid.is_match(x)))
+        .count())
 }
 
 #[cfg(test)]
@@ -156,19 +169,18 @@ hgt:179cm
 hcl:#cfa07d eyr:2025 pid:166559648
 iyr:2011 ecl:brn hgt:59in";
 
-    static SAMPLE_INPUT_INVALID: &str = "eyr:1972 cid:100
-hcl:#18171d ecl:amb hgt:170 pid:186cm iyr:2018 byr:1926
+    static SAMPLE_INPUT_INVALID: &str = "pid:087499704 hgt:740in ecl:grn iyr:2012 eyr:2030 byr:1980
+hcl:#623a2f
 
-iyr:2019
-hcl:#602927 eyr:1967 hgt:170cm
-ecl:grn pid:012533040 byr:1946
+eyr:2029 ecl:blu cid:129 byr:1789
+iyr:2014 pid:896056539 hcl:#a97842 hgt:165cm
 
-hcl:dab227 iyr:2012
-ecl:brn hgt:182cm pid:021572410 eyr:2020 byr:1992 cid:277
+hcl:#888785
+hgt:164cm byr:2001 iyr:201 cid:88
+pid:545766238 ecl:hzl
+eyr:2022
 
-hgt:59cm ecl:zzz
-eyr:2038 hcl:74454a iyr:2023
-pid:3556412378 byr:2007";
+iyr:2010 hgt:158cm hcl:#b662a ecl:blu byr:1944 eyr:2021 pid:093154719";
 
     static SAMPLE_INPUT_VALID: &str = "pid:087499704 hgt:74in ecl:grn iyr:2012 eyr:2030 byr:1980
 hcl:#623a2f
@@ -184,10 +196,10 @@ eyr:2022
 iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719";
 
     static SAMPLE_DATA: &'static [Passport] = &[
-        Passport {byr:Some(1937), iyr:Some(2017), eyr:Some(2020), hgt:Some(183), unit:Some(Unit::Cm), hcl:Some("#fffffd"), ecl:Some("gry"), pid:Some("860033327"), cid:Some(147)},
-        Passport {byr:Some(1929), iyr:Some(2013), eyr:Some(2023), hgt:None, unit:None, hcl:Some("#cfa07d"), ecl:Some("amb"), pid:Some("028048884"), cid:Some(350)},
-        Passport {byr:Some(1931), iyr:Some(2013), eyr:Some(2024), hgt:Some(179), unit:Some(Unit::Cm), hcl:Some("#ae17e1"), ecl:Some("brn"), pid:Some("760753108"), cid:None},
-        Passport {byr:None, iyr:Some(2011), eyr:Some(2025), hgt:Some(59), unit:Some(Unit::Inch), hcl:Some("#cfa07d"), ecl:Some("brn"), pid:Some("166559648"), cid:None},
+        Passport {byr:Some(1937), iyr:Some(2017), eyr:Some(2020), hgt:Some(Height{ value: 183, unit: Unit::Cm }), hcl:Some("#fffffd"), ecl:Some("gry"), pid:Some("860033327"), cid:Some(147)},
+        Passport {byr:Some(1929), iyr:Some(2013), eyr:Some(2023), hgt:None, hcl:Some("#cfa07d"), ecl:Some("amb"), pid:Some("028048884"), cid:Some(350)},
+        Passport {byr:Some(1931), iyr:Some(2013), eyr:Some(2024), hgt:Some(Height { value: 179, unit: Unit::Cm }), hcl:Some("#ae17e1"), ecl:Some("brn"), pid:Some("760753108"), cid:None},
+        Passport {byr:None, iyr:Some(2011), eyr:Some(2025), hgt:Some(Height{ value: 59, unit: Unit::Inch }), hcl:Some("#cfa07d"), ecl:Some("brn"), pid:Some("166559648"), cid:None},
     ];
 
     static SAMPLE_GOALS: [usize; 3] = [2, 0, 4];
@@ -197,6 +209,18 @@ iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719";
         assert_eq!(
             parse_data(SAMPLE_INPUT).unwrap(),
             SAMPLE_DATA);
+    }
+
+    #[test]
+    fn test_parse_height() {
+        assert_eq!(
+            parse_height("100cm").unwrap(),
+            Some(Height{ value: 100, unit: Unit::Cm}));
+        assert_eq!(
+            parse_height("60in").unwrap(),
+            Some(Height{ value: 60, unit: Unit::Inch}));
+        assert!(
+            parse_height("100").is_err());
     }
 
     #[test]
@@ -217,6 +241,6 @@ iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719";
     fn test_part2_valid() {
         assert_eq!(
             part2(&parse_data(SAMPLE_INPUT_VALID).unwrap()).unwrap(),
-            SAMPLE_GOALS[1]);
+            SAMPLE_GOALS[2]);
     }
 }

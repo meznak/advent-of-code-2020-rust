@@ -61,7 +61,7 @@ fn parse_args() -> Result<ParsedArgs, RunError> {
 fn get_data(day: &str) -> Result<String, RunError> {
     let data_path = path::Path::new("data").join(day);
     match fs::read_to_string(data_path) {
-        Ok(data) => Ok(data),
+        Ok(data) => Ok(data.replace("\r\n", "\n")),
         Err(e) => Err(RunError::IO(e))
     }
 }
