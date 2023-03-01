@@ -131,9 +131,9 @@ fn part1(values: &[Passport]) -> Result<usize, RunError> {
 fn part2(values: &[Passport]) -> Result<usize, RunError> {
     // Count valid passports: has all fields with valid values, ignoring cid
 
-    let re_hcl = Regex::new(r"#[[:alpha:]0-9]{6}").unwrap();
+    let re_hcl = Regex::new(r"#[0-9a-f]{6}").unwrap();
     let re_ecl = Regex::new(r"amb|blu|brn|gry|grn|hzl|oth").unwrap();
-    let re_pid = Regex::new(r"[0-9]{9}").unwrap();
+    let re_pid = Regex::new(r"^[0-9]{9}$").unwrap();
 
     Ok(values.iter().filter(|passport|
         passport.byr.map_or(false, |x| x >= 1920 && x <= 2002) &&
@@ -180,7 +180,10 @@ hgt:164cm byr:2001 iyr:201 cid:88
 pid:545766238 ecl:hzl
 eyr:2022
 
-iyr:2010 hgt:158cm hcl:#b662a ecl:blu byr:1944 eyr:2021 pid:093154719";
+iyr:2010 hgt:158cm hcl:#b662a ecl:blu byr:1944 eyr:2021 pid:093154719
+
+pid:087499704 hgt:74 ecl:grn iyr:2012 eyr:2030 byr:1980
+hcl:#623a2f";
 
     static SAMPLE_INPUT_VALID: &str = "pid:087499704 hgt:74in ecl:grn iyr:2012 eyr:2030 byr:1980
 hcl:#623a2f
@@ -219,8 +222,9 @@ iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719";
         assert_eq!(
             parse_height("60in").unwrap(),
             Some(Height{ value: 60, unit: Unit::Inch}));
-        assert!(
-            parse_height("100").is_err());
+        assert_eq!(
+            parse_height("100").unwrap(),
+            Some(Height{ value: 100, unit: Unit::None}));
     }
 
     #[test]
