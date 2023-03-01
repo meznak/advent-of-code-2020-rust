@@ -37,9 +37,15 @@ fn parse_data(data: &str) -> Result<Vec<Ticket>, RunError> {
 }
 
 fn part1(values: &[Ticket]) -> Result<usize, RunError> {
-    // row * 8 + seat
+    // Seat ID: row * 8 + seat
+    // Return highest seat ID seen
 
-    todo!();
+    values.iter().map(|ticket|
+        ticket.row * 8 + ticket.col
+    )
+    .max()
+    .ok_or(RunError::PartFailed)
+
 }
 
 fn part2(values: &[Ticket]) -> Result<usize, RunError> {
@@ -52,9 +58,12 @@ fn part2(values: &[Ticket]) -> Result<usize, RunError> {
 mod tests {
     use super::*;
 
-    static SAMPLE_INPUT: &str ="FBFBBFFRLR";
+    static SAMPLE_INPUT: &str = "FBFBBFFRLR";
+    static SAMPLE_PART_1: &str = "BFFFBBFRRR
+FFFBBBFRRR
+BBFFBBFRLL";
     static SAMPLE_DATA: &'static [Ticket] = &[Ticket{ row: 44, col: 5}];
-    static SAMPLE_GOALS: [usize; 2] = [357, 0];
+    static SAMPLE_GOALS: [usize; 2] = [820, 0];
 
     #[test]
     fn test_parse() {
@@ -78,7 +87,7 @@ mod tests {
     #[test]
     fn test_part1() {
         assert_eq!(
-            part1(SAMPLE_DATA).unwrap(),
+            part1(&parse_data(SAMPLE_PART_1).unwrap()).unwrap(),
             SAMPLE_GOALS[0]);
     }
 
