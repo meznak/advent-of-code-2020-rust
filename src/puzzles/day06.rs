@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::{HashSet, HashMap};
 
 use crate::RunError;
 
@@ -35,9 +35,32 @@ fn part1(values: &[&str]) -> Result<usize, RunError> {
 }
 
 fn part2(values: &[&str]) -> Result<usize, RunError> {
-    // What's the goal?
+    // Count questions questions answered by all in each group
+    // Return sum of those counts
 
-    todo!();
+    Ok(values.iter()
+    .map(|group| {
+        let mut questions: HashMap<char, usize> = HashMap::new();
+
+        group.chars()
+            .for_each(|c| {
+                if let Some(x) = questions.get_mut(&c) {
+                    *x += 1;
+                } else {
+                    questions.insert(c, 1);
+                }
+            });
+
+        let line_count = questions.get(&'\n').unwrap_or(&0) + 1;
+        // println!("line count: {line_count}");
+        questions.iter()
+            .filter(|(k, _)| *k != &'\n')
+            .filter(|(_, v)| *v == &line_count)
+            .map(|(k, _)| *k)
+            .collect::<Vec<char>>()
+            .len()
+    })
+    .sum::<usize>())
 }
 
 #[cfg(test)]
@@ -63,7 +86,7 @@ a
 
 b";
     static SAMPLE_DATA: &'static [[&str; 3]; 1] = &[["abcx", "abcy", "abcz"]];
-    static SAMPLE_GOALS: [usize; 2] = [11, 0];
+    static SAMPLE_GOALS: [usize; 2] = [11, 6];
 
     #[test]
     fn test_parse() {
@@ -76,14 +99,15 @@ b";
     fn test_part1() {
         assert_eq!(
             part1(&parse_data(SAMPLE_INPUT_PARTS).unwrap())
-            .unwrap(),
+                .unwrap(),
             SAMPLE_GOALS[0]);
     }
 
     #[test]
     fn test_part2() {
         assert_eq!(
-            part2(&SAMPLE_DATA[0]).unwrap(),
+            part2(&parse_data(SAMPLE_INPUT_PARTS).unwrap())
+                .unwrap(),
             SAMPLE_GOALS[1]);
     }
 }
