@@ -4,8 +4,8 @@ pub fn main(part: u8, data: &str) -> Result<usize, RunError> {
     let parsed_data = parse_data(data)?;
 
     match part {
-        1 => part1(parsed_data),
-        2 => part2(parsed_data),
+        1 => part1(&parsed_data),
+        2 => part2(&parsed_data),
         _ => Err(RunError::BadPartNum)
     }
 }
@@ -39,7 +39,7 @@ mod tests {
     #[test]
     fn test_parse() {
         assert_eq!(
-            parse_data(SAMPLE_INPUT).unwrap(),
+            parse_data(&SAMPLE_INPUT).unwrap(),
             SAMPLE_DATA);
     }
 
